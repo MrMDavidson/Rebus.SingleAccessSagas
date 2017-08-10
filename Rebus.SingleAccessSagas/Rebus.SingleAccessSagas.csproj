@@ -2,6 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
+
+    <PackageId>Rebus.SingleAccessSagas</PackageId>
+    <PackageVersion>0.0.1-alpha</PackageVersion>
+    <Authors>MrMDavidson</Authors>
+    <Description>Provides opt-in support for Rebus sagas to be executed in a single access fashion; eg. Only one handler for a given saga will run at a time</Description>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Initial version</PackageReleaseNotes>
+    <Copyright>Copyright 2017 (c) Michael Davidson. All rights reserved.</Copyright>
+    <PackageTags>rebus queue messaging service bus single access saga</PackageTags>
+    <Version>0.0.1-alpha</Version>
+    <PackageLicenseUrl>https://github.com/MrMDavidson/Rebus.SingleAccessSagas/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/MrMDavidson/Rebus.SingleAccessSagas</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/mookid8000/Rebus/raw/master/artwork/little_rebusbus2_copy-200x200.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/MrMDavidson/Rebus.SingleAccessSagas</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
