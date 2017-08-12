@@ -19,9 +19,7 @@
     <RepositoryType>git</RepositoryType>
     <FileVersion>0.0.1.1</FileVersion>
     <AssemblyVersion>0.0.1.0</AssemblyVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Rebus.SingleAccessSagas.xml</DocumentationFile>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <TreatSpecificWarningsAsErrors />
   </PropertyGroup>
