@@ -18,6 +18,16 @@ This however may not always be achievable. Enter the Single Access Saga.
 
 Single Access Sagas work by acquiring a lock for a saga before the saga's handler is executed. If the lock cannot be acquired then the message is deferred. If a single message has multiple saga handlers then all locks must be acquired. If any can not be acquired then the message is deferred.
 
+## How do I get it?
+
+You can either clone this repository and build the source yourself or grab it vi NuGet;
+
+```
+Install-Package Rebus.SingleAccessSagas -Pre
+```
+
+Note: For now the package is marked as a pre-release package.
+
 ## How do I use it?
 
 Usage is pretty straight forward. First in your bootstrap code where you configure your bus you need to enable single access sagas;
