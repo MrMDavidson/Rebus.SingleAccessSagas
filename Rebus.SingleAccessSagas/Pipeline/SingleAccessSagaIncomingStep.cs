@@ -30,15 +30,17 @@ Note: this may cause message reordering")]
 		private readonly Lazy<IBus> _bus;
 		private readonly ISagaLockProvider _sagaLockProvider;
 		private readonly ISagaStorage _sagaStorage;
+		private readonly ISagaLockRetryStrategy _retryStrategy;
 
 		/// <summary>
 		/// Constructs the step
 		/// </summary>
-		public SingleAccessSagaIncomingStep(ILog log, Func<IBus> busFactory, ISagaLockProvider sagaLockProvider, ISagaStorage sagaStorage) {
+		public SingleAccessSagaIncomingStep(ILog log, Func<IBus> busFactory, ISagaLockProvider sagaLockProvider, ISagaStorage sagaStorage, ISagaLockRetryStrategy retryStrategy) {
 			_log = log;
 			_bus = new Lazy<IBus>(busFactory, true);
 			_sagaLockProvider = sagaLockProvider;
 			_sagaStorage = sagaStorage;
+			_retryStrategy = retryStrategy;
 		}
 
 		/// <summary>
@@ -66,6 +68,7 @@ Note: this may cause message reordering")]
 			bool allLocksAcquired = true;
 
 			try {
+				ISagaLock failedLock = null;
 				foreach (HandlerInvoker sagaInvoker in singleAccessHandlers) {
 					SagaDataCorrelationProperties props = helper.GetCorrelationProperties(body, sagaInvoker.Saga);
 					IEnumerable<CorrelationProperty> propsForMessage = props.ForMessage(body);
@@ -91,6 +94,7 @@ Note: this may cause message reordering")]
 
 						_log.Debug($"{message.GetMessageLabel()} could not acquire a saga lock for {correlationId} to process {sagaInvoker.Handler.GetType().FullName}");
 						allLocksAcquired = false;
+						failedLock = slock;
 						break;
 					}
 				}
@@ -100,8 +104,8 @@ Note: this may cause message reordering")]
 				} else {
 					_log.Info($"{message.GetMessageLabel()} could not have all required locks acquired. Deferring for later processing");
 
-					Random random = new Random();
-					await _bus.Value.Advanced.TransportMessage.Defer(TimeSpan.FromSeconds(random.Next(5, 10)));
+					TimeSpan retryInterval = _retryStrategy.GetMessageRetryInterval(failedLock, message);
+					await _bus.Value.Advanced.TransportMessage.Defer(retryInterval);
 				}
 			} catch (Exception ex) {
 				_log.Error(ex, "Error during processing of single access sagas - will revert any locks");

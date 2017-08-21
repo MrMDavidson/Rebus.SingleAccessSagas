@@ -65,3 +65,7 @@ Yes! I strongly encourage you to provide your own locking mechanism based on you
   1. Register your locking mechanism; ```config.Options(opt => opt.Register<ISagaLockProvider>(res => new MySagaLockProvider()));```
   
 That's it!
+
+## Can I control how messages are retried?
+
+Sort of! As it stands messages for which all saga locks cannot be acquired will be deferred for later processing. You can control the specifics of the timing behind the retry of messages through providing your own implementation of `ISagaRetryLockStrategy`. The default is to use a random jitter between 5 and 10s. If, at the time of calling `EnableSingleAccessSagas` no implementation has been provided this default will be used.
