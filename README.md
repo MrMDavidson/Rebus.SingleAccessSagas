@@ -63,6 +63,7 @@ Yes! I strongly encourage you to provide your own locking mechanism based on you
   1. Implement `Rebus.SingleAccessSagas.ISagaLockProvider`. When `LockFor` is called you should return an implementation of `ISagaLock` constructed with enough information to acquire the lock relevant to `sagaCorrelationId`. But don't acquire the lock yet!
   1. Implement `Rebus.SingleAccessSagas.ISagaLock`. It's a simple interface; when `TryAcquire()` is called you should attempt to acquire the lock. Return `true` if the lock was acquired and `false` if it wasn't. When `Dispose()` is called you should release any resources and if the lock had been acquired then also release the lock so the next handler can use it.
   1. Register your locking mechanism; ```config.Options(opt => opt.Register<ISagaLockProvider>(res => new MySagaLockProvider()));```
+  1. If your locking mechanism is based on a lease that requires renewal you can make your `ISagaLockProvider` implementation wrap your `ISagaLock` in a `Rebus.SingleAccessSagas.AutomaticallyRenewingSagaLock` which will renew the lock periodically on your behalf.
   
 That's it!
 
