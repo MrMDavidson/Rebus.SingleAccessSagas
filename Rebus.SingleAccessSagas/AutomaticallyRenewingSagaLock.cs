@@ -35,10 +35,6 @@ namespace Rebus.SingleAccessSagas {
 		/// Attempt to acquire a lock. If the lock was successfully acquired return <c>true</c>. If the lock could not be acquired returns <c>false</c>
 		/// </summary>
 		public async Task<bool> TryAcquire() {
-			if (_acquiredLock == false) {
-				return true;
-			}
-
 			_acquiredLock = await _actualLock.TryAcquire();
 			if (_acquiredLock == true) {
 				_lockRenewalTimer.Change(_reacquistionInterval, _reacquistionInterval);
