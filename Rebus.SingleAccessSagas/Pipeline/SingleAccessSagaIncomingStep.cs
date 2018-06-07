@@ -22,100 +22,66 @@ namespace Rebus.SingleAccessSagas.Pipeline {
 If they are then locks are acquired for each single access handler the message will encounter. If all locks are not acquired then the message will be deferred for later processing.
 
 Note: this may cause message reordering")]
-	public class SingleAccessSagaIncomingStep : IIncomingStep {
+	public class SingleAccessSagaIncomingStep : BaseLimitedAccessIncomingStep<ISagaLock> {
 		private static readonly Type SingleAccessSagaType = typeof(ISingleAccessSaga);
 		private static readonly Type OpenSagaType = typeof(Saga<>);
 
-		private readonly ILog _log;
-		private readonly Lazy<IBus> _bus;
 		private readonly ISagaLockProvider _sagaLockProvider;
 		private readonly ISagaStorage _sagaStorage;
-		private readonly ISagaLockRetryStrategy _retryStrategy;
+		private readonly SagaHelper _sagaHelper;
 
 		/// <summary>
 		/// Constructs the step
 		/// </summary>
-		public SingleAccessSagaIncomingStep(ILog log, Func<IBus> busFactory, ISagaLockProvider sagaLockProvider, ISagaStorage sagaStorage, ISagaLockRetryStrategy retryStrategy) {
-			_log = log;
-			_bus = new Lazy<IBus>(busFactory, true);
+		public SingleAccessSagaIncomingStep(ILog log, Func<IBus> busFactory, ISagaLockProvider sagaLockProvider, ISagaStorage sagaStorage, ISagaLockRetryStrategy retryStrategy) 
+			: base(busFactory, log, retryStrategy) {
 			_sagaLockProvider = sagaLockProvider;
 			_sagaStorage = sagaStorage;
-			_retryStrategy = retryStrategy;
+			_sagaHelper = new SagaHelper();
 		}
 
-		/// <summary>
-		/// Inspects the message being processed and if any of its handlers have requested single access to the saga then acquires a lock on the saga. If a lock cannot be acquired the message is deferred until a later time.
-		/// </summary>
-		public async Task Process(IncomingStepContext context, Func<Task> next) {
-			List<HandlerInvoker> singleAccessHandlers = context.Load<HandlerInvokers>()
+		/// <inheritdoc />
+		protected override IList<HandlerInvoker> GetInvokersRequiringLocks(IncomingStepContext context) {
+			return base.GetInvokersRequiringLocks(context)
 				.Where(hi => hi.HasSaga)
 				.Where(hi => SingleAccessSagaType.IsInstanceOfType(hi.Handler))
 				.ToList();
-
-			if (singleAccessHandlers.Any() == false) {
-				await next();
-				return;
-			}
-
-			SagaHelper helper = new SagaHelper();
-			Message message = context.Load<Message>();
-			object body = message.Body;
-
-			_log.Debug($"{message.GetMessageLabel()} has {singleAccessHandlers.Count} single access message handlers");
-
-
-			List<ISagaLock> locks = new List<ISagaLock>(singleAccessHandlers.Count);
-			bool allLocksAcquired = true;
-
-			try {
-				ISagaLock failedLock = null;
-				foreach (HandlerInvoker sagaInvoker in singleAccessHandlers) {
-					SagaDataCorrelationProperties props = helper.GetCorrelationProperties(body, sagaInvoker.Saga);
-					IEnumerable<CorrelationProperty> propsForMessage = props.ForMessage(body);
-					Type sagaDataType = GetSagaDataType(sagaInvoker.Saga);
-					if (sagaDataType == null) {
-						_log.Error($"Could not extract the SagaData type from {sagaInvoker.Saga?.GetType()}. Aborting.");
-						throw new ArgumentException($"Could not extract the SagaData type from {sagaInvoker.Saga?.GetType()}. Aborting.");
-					}
-
-					foreach (CorrelationProperty correlationProperty in propsForMessage) {
-						object correlationId = correlationProperty.ValueFromMessage(MessageContext.Current, body);
-						ISagaData sagaData = await _sagaStorage.Find(sagaDataType, correlationProperty.PropertyName, correlationId);
-						if ((sagaData == null) && (sagaInvoker.CanBeInitiatedBy(body.GetType()) == false)) {
-							_log.Debug($"No saga data for {message.GetMessageLabel()} and the saga cannot be initiated by this message. Skipping lock.");
-							continue;
-						}
-
-						ISagaLock slock = await _sagaLockProvider.LockFor(correlationId);
-						locks.Add(slock);
-						if (await slock.TryAcquire() == true) {
-							continue;
-						}
-
-						_log.Debug($"{message.GetMessageLabel()} could not acquire a saga lock for {correlationId} to process {sagaInvoker.Handler.GetType().FullName}");
-						allLocksAcquired = false;
-						failedLock = slock;
-						break;
-					}
-				}
-
-				if (allLocksAcquired == true) {
-					await next();
-				} else {
-					_log.Info($"{message.GetMessageLabel()} could not have all required locks acquired. Deferring for later processing");
-
-					TimeSpan retryInterval = _retryStrategy.GetMessageRetryInterval(failedLock, message);
-					await _bus.Value.Advanced.TransportMessage.Defer(retryInterval);
-				}
-			} catch (Exception ex) {
-				_log.Error(ex, "Error during processing of single access sagas - will revert any locks");
-				throw;
-			} finally {
-				foreach (ISagaLock slock in locks) {
-					slock.Dispose();
-				}
-			}
 		}
+
+		/// <inheritdoc />
+		protected override async Task<bool> TryAcquireLocksForHandler(HandlerInvoker invoker, Message message, IncomingStepContext context, IList<ISagaLock> locks) {
+			object body = message.Body;
+			SagaDataCorrelationProperties props = _sagaHelper.GetCorrelationProperties(body, invoker.Saga);
+			IEnumerable<CorrelationProperty> propsForMessage = props.ForMessage(body);
+			Type sagaDataType = GetSagaDataType(invoker.Saga);
+			if (sagaDataType == null) {
+				Log.Error($"Could not extract the SagaData type from {invoker.Saga?.GetType()}. Aborting.");
+				throw new ArgumentException($"Could not extract the SagaData type from {invoker.Saga?.GetType()}. Aborting.");
+			}
+
+			bool allLocksAcquired = true;
+			foreach (CorrelationProperty correlationProperty in propsForMessage) {
+				object correlationId = correlationProperty.ValueFromMessage(MessageContext.Current, body);
+				ISagaData sagaData = await _sagaStorage.Find(sagaDataType, correlationProperty.PropertyName, correlationId);
+				if ((sagaData == null) && (invoker.CanBeInitiatedBy(body.GetType()) == false)) {
+					Log.Debug($"No saga data for {message.GetMessageLabel()} and the saga cannot be initiated by this message. Skipping lock.");
+					continue;
+				}
+
+				ISagaLock slock = await _sagaLockProvider.LockFor(correlationId);
+				locks.Add(slock);
+				if (await slock.TryAcquire() == true) {
+					continue;
+				}
+
+				Log.Debug($"{message.GetMessageLabel()} could not acquire a saga lock for {correlationId} to process {invoker.Handler.GetType().FullName}");
+				allLocksAcquired = false;
+				break;
+			}
+
+			return allLocksAcquired;
+		}
+
 
 		/// <summary>
 		/// When given a <seealso cref="Saga"/> will return the type of <seealso cref="Saga{TSagaData}"/>
