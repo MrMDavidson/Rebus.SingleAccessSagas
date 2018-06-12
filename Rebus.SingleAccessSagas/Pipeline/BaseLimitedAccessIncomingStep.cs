@@ -71,6 +71,7 @@ namespace Rebus.SingleAccessSagas.Pipeline {
 
 			} catch (Exception ex) {
 				Log.Error(ex, "Error during processing of limited access handling - will revert any locks.");
+				throw;
 			} finally {
 				foreach (TLockType slock in locks) {
 					slock.Dispose();
