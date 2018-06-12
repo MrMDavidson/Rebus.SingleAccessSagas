@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using Rebus.Activation;
 using Rebus.Bus;
@@ -36,11 +34,22 @@ namespace Rebus.SingleAccessSagas.Sample {
 					handlerActivator.Register<IHandleMessages<SingleAccessSaga.StartSagaCommand>>(() => new SingleAccessSaga(bus));
 					handlerActivator.Register<IHandleMessages<SingleAccessSaga.IncrementCounterCommand>>(() => new SingleAccessSaga(bus));
 
+					handlerActivator.Register<IHandleMessages<LimitedAccessSaga.StartSagaCommand>>(() => new LimitedAccessSaga(bus));
+					handlerActivator.Register<IHandleMessages<LimitedAccessSaga.IncrementCounterCommand>>(() => new LimitedAccessSaga(bus));
+
+					handlerActivator.Register<IHandleMessages<LimitAccessHandler.PingCommand>>(() => new LimitAccessHandler());
+
 					bus.Advanced.Topics.Subscribe(typeof(NormalSaga.StartSagaCommand).GetSimpleAssemblyQualifiedName());
 					bus.Advanced.Topics.Subscribe(typeof(NormalSaga.IncrementCounterCommand).GetSimpleAssemblyQualifiedName());
 
 					bus.Advanced.Topics.Subscribe(typeof(SingleAccessSaga.StartSagaCommand).GetSimpleAssemblyQualifiedName());
 					bus.Advanced.Topics.Subscribe(typeof(SingleAccessSaga.IncrementCounterCommand).GetSimpleAssemblyQualifiedName());
+
+					bus.Advanced.Topics.Subscribe(typeof(LimitedAccessSaga.StartSagaCommand).GetSimpleAssemblyQualifiedName());
+					bus.Advanced.Topics.Subscribe(typeof(LimitedAccessSaga.IncrementCounterCommand).GetSimpleAssemblyQualifiedName());
+
+					bus.Advanced.Topics.Subscribe(typeof(LimitAccessHandler.PingCommand).GetSimpleAssemblyQualifiedName());
+
 
 					void DisplayHelp() {
 						Console.WriteLine("Bus has started. Press any of the following keys");
@@ -49,6 +58,8 @@ namespace Rebus.SingleAccessSagas.Sample {
 						Console.WriteLine("3 = Launch another instance");
 						Console.WriteLine("5 = Start Normal Saga");
 						Console.WriteLine("6 = Start Single Access Saga");
+						Console.WriteLine("7 = Start Limited Access Saga");
+						Console.WriteLine("8 = Spam limited access handler");
 						Console.WriteLine("? = Display this help");
 						Console.WriteLine("Q = Quit");
 					}
@@ -100,6 +111,20 @@ namespace Rebus.SingleAccessSagas.Sample {
 									.Wait();
 								break;
 							}
+							case '7': {
+								bus.Send(new LimitedAccessSaga.StartSagaCommand() { Id = Guid.NewGuid(), NumberOfMessages = 100 })
+									.Wait();
+								break;
+							}
+
+							case '8': {
+								Parallel.For(0, 100, (x) => { bus.Send(new LimitAccessHandler.PingCommand()).Wait(); }
+								);
+
+								//bus.Send(new LimitedAccessSaga.StartSagaCommand() { Id = Guid.NewGuid(), NumberOfMessages = 100 })
+								//	.Wait();
+								break;
+							}
 						}
 
 						input = Console.ReadKey();
@@ -144,7 +169,9 @@ namespace Rebus.SingleAccessSagas.Sample {
 			}
 
 			config.Options(o => o.SimpleRetryStrategy(errorQueueName, maxDeliveryAttempts: 5));
+
 			config.Options(o => o.EnableSingleAccessSagas());
+			config.Options(o => o.EnableConcurrencyControlledHandling());
 
 			config.Routing(x => x.Register(res => new StaticRouter(inputQueueName)));
 

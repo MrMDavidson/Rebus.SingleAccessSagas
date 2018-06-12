@@ -9,7 +9,6 @@ namespace Rebus.SingleAccessSagas.Sample {
 		IAmInitiatedBy<SingleAccessSaga.StartSagaCommand>,
 		IHandleMessages<SingleAccessSaga.IncrementCounterCommand>,
 		ISingleAccessSaga {
-
 		private readonly IBus _bus;
 
 		public class StartSagaCommand {
