@@ -13,8 +13,8 @@ namespace Rebus.SingleAccessSagas.Semaphore {
 		/// <summary>
 		/// Constructs a new instance of the lock and creates a system wide semaphore named <paramref name="semaphoreName"/>
 		/// </summary>
-		public SemaphoreSagaLock(string semaphoreName) {
-			_semaphore = new System.Threading.Semaphore(1, 1, semaphoreName);
+		public SemaphoreSagaLock(string semaphoreName, int maxConcurrency = 1) {
+			_semaphore = new System.Threading.Semaphore(maxConcurrency, maxConcurrency, semaphoreName);
 		}
 
 		/// <summary>
