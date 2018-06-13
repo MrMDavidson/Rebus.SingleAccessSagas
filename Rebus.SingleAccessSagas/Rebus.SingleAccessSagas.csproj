@@ -5,20 +5,20 @@
 
     <PackageId>Rebus.SingleAccessSagas</PackageId>
     <Authors>MrMDavidson</Authors>
-    <Description>Provides opt-in support for Rebus sagas to be executed in a single access fashion; eg. Only one handler for a given saga will run at a time</Description>
+    <Description>Provides opt-in support for concurrency controls on Rebus message handling. This includes single access sagas (ie. only ony handler for a given saga running at a time) as well as more general handler throttling (ie. Throttling message through put based on types or properties)</Description>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>Initial version</PackageReleaseNotes>
-    <Copyright>Copyright 2017 (c) Michael Davidson. All rights reserved.</Copyright>
-    <PackageTags>rebus queue messaging service bus single access saga</PackageTags>
-    <Version>0.0.1-alpha6</Version>
+    <Copyright>Copyright 2017-2018 (c) Michael Davidson. All rights reserved.</Copyright>
+    <PackageTags>rebus queue messaging service bus single access saga concurrency lock</PackageTags>
+    <Version>0.1.0-alpha1</Version>
     <PackageVersion>$(Version)</PackageVersion>
     <PackageLicenseUrl>https://github.com/MrMDavidson/Rebus.SingleAccessSagas/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/MrMDavidson/Rebus.SingleAccessSagas</PackageProjectUrl>
     <PackageIconUrl>https://github.com/mookid8000/Rebus/raw/master/artwork/little_rebusbus2_copy-200x200.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/MrMDavidson/Rebus.SingleAccessSagas</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <FileVersion>0.0.1.5</FileVersion>
-    <AssemblyVersion>0.0.1.0</AssemblyVersion>
+    <FileVersion>0.1.0.1</FileVersion>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Rebus.SingleAccessSagas.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <TreatSpecificWarningsAsErrors />
