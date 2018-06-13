@@ -1,4 +1,5 @@
 ﻿using Rebus.Handlers;
+using Rebus.Sagas;
 
 namespace Rebus.SingleAccessSagas {
 	/// <summary>
@@ -19,5 +20,13 @@ namespace Rebus.SingleAccessSagas {
 		/// <param name="message">Message having concurrency controls applied</param>
 		/// <returns><c>null</c> if there's no concurrency controls for <paramref name="message"/> otherwise a <seealso cref="ConcurrencyControlInfo"/> describing the concurrency to be applied</returns>
 		ConcurrencyControlInfo GetConcurrencyControlInfoForMessage(TMessageType message);
+	}
+
+	/// <summary>
+	/// Market interface to indicate that not only does a saga get initiated by <typeparamref name="TMessageType"/> but that it does so in a concurrency controlled way
+	/// </summary>
+	/// <typeparam name="TMessageType"></typeparam>
+	public interface IAmInitiatedByConcurrencyControlledMessages<in TMessageType> : IAmInitiatedBy<TMessageType>, IHandleConcurrencyControlledMessages<TMessageType> {
+
 	}
 }
