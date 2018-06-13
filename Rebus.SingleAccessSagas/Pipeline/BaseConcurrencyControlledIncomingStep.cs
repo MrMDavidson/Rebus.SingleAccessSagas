@@ -10,9 +10,9 @@ using Rebus.Pipeline.Receive;
 
 namespace Rebus.SingleAccessSagas.Pipeline {
 	/// <summary>
-	/// Base class for any kind of limited access handling.
+	/// Base class for any kind of concurrency controlled handling.
 	/// </summary>
-	public class BaseLimitedAccessIncomingStep<TLockType> : IIncomingStep where TLockType : IDisposable {
+	public class BaseConcurrencyControlledIncomingStep<TLockType> : IIncomingStep where TLockType : IDisposable {
 		/// <summary>
 		/// Log instance for the step
 		/// </summary>
@@ -27,7 +27,7 @@ namespace Rebus.SingleAccessSagas.Pipeline {
 		/// <param name="busFactory">A factory that provides a <see cref="IBus"/>. Will not be constructed until a message is processed.</param>
 		/// <param name="log">Logger for the step</param>
 		/// <param name="retryStrategy">Strategy that can determine when to reschedule a message when a message cannot have all of its locks acquired</param>
-		protected BaseLimitedAccessIncomingStep(Func<IBus> busFactory, ILog log, IHandlerLockRetryStrategy retryStrategy) {
+		protected BaseConcurrencyControlledIncomingStep(Func<IBus> busFactory, ILog log, IHandlerLockRetryStrategy retryStrategy) {
 			Log = log;
 			_bus = new Lazy<IBus>(busFactory, true);
 			_retryStrategy = retryStrategy;

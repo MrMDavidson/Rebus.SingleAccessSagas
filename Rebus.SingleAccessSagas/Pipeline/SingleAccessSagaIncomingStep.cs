@@ -22,7 +22,7 @@ namespace Rebus.SingleAccessSagas.Pipeline {
 If they are then locks are acquired for each single access handler the message will encounter. If all locks are not acquired then the message will be deferred for later processing.
 
 Note: this may cause message reordering")]
-	public class SingleAccessSagaIncomingStep : BaseLimitedAccessIncomingStep<IHandlerLock> {
+	public class SingleAccessSagaIncomingStep : BaseConcurrencyControlledIncomingStep<IHandlerLock> {
 		private static readonly Type SingleAccessSagaType = typeof(ISingleAccessSaga);
 		private static readonly Type OpenSagaType = typeof(Saga<>);
 

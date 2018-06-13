@@ -18,7 +18,7 @@ namespace Rebus.SingleAccessSagas.Pipeline {
 	[StepDocumentation(@"Checks to see if a message requires concurrency controls. If they are then locks are acquired for each handler the message will encounter. If all locks are not acquired then the message will be deferred for later processing.
 
 Note: this may cause message reordering")]
-	public class ConcurrencyControlledHandlerIncomingStep : BaseLimitedAccessIncomingStep<IHandlerLock> {
+	public class ConcurrencyControlledHandlerIncomingStep : BaseConcurrencyControlledIncomingStep<IHandlerLock> {
 		private static readonly Type HandleConcurrencyControlledMessagesType = typeof(IHandleConcurrencyControlledMessages);
 		private static readonly Type OpenHandleConcurrencyControlledMessagesType = typeof(IHandleConcurrencyControlledMessages<>);
 		private static readonly ConcurrentDictionary<Type, Func<IHandleConcurrencyControlledMessages, object, ConcurrencyControlInfo>> GetGetConcurrencyControlInfoForMessageCache = new ConcurrentDictionary<Type, Func<IHandleConcurrencyControlledMessages, object, ConcurrencyControlInfo>>();
