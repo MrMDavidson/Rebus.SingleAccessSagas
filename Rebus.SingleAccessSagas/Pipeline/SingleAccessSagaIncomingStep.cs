@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Rebus.Bus;
 using Rebus.Extensions;
@@ -26,16 +27,16 @@ Note: this may cause message reordering")]
 		private static readonly Type SingleAccessSagaType = typeof(ISingleAccessSaga);
 		private static readonly Type OpenSagaType = typeof(Saga<>);
 
-		private readonly ISagaLockProvider _sagaLockProvider;
+		private readonly IHandlerLockProvider _lockProvider;
 		private readonly ISagaStorage _sagaStorage;
 		private readonly SagaHelper _sagaHelper;
 
 		/// <summary>
 		/// Constructs the step
 		/// </summary>
-		public SingleAccessSagaIncomingStep(ILog log, Func<IBus> busFactory, ISagaLockProvider sagaLockProvider, ISagaStorage sagaStorage, IHandlerLockRetryStrategy retryStrategy) 
+		public SingleAccessSagaIncomingStep(ILog log, Func<IBus> busFactory, IHandlerLockProvider lockProvider, ISagaStorage sagaStorage, IHandlerLockRetryStrategy retryStrategy) 
 			: base(busFactory, log, retryStrategy) {
-			_sagaLockProvider = sagaLockProvider;
+			_lockProvider = lockProvider;
 			_sagaStorage = sagaStorage;
 			_sagaHelper = new SagaHelper();
 		}
@@ -68,7 +69,7 @@ Note: this may cause message reordering")]
 					continue;
 				}
 
-				IHandlerLock slock = await _sagaLockProvider.LockFor(correlationId);
+				IHandlerLock slock = await _lockProvider.LockFor(new ConcurrencyControlInfo(correlationId, maxConcurrency: 1, operationCost: 1));
 				locks.Add(slock);
 				if (await slock.TryAcquire() == true) {
 					continue;

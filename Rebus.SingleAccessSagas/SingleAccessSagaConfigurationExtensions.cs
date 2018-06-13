@@ -20,10 +20,10 @@ namespace Rebus.SingleAccessSagas {
 		/// (CPU, cost, limited number of external API calls) and you want to ensure that a <seealso cref="Rebus.Exceptions.ConcurrencyException"/>
 		/// is not thrown causing resources to be wasted
 		/// </summary>
-		/// <remarks>Note: If you have multiple worker machines you will need to register a suitable <seealso cref="ISagaLockProvider"/></remarks>
+		/// <remarks>Note: If you have multiple worker machines you will need to register a suitable <seealso cref="IHandlerLockProvider"/></remarks>
 		public static void EnableSingleAccessSagas(this OptionsConfigurer configurer) {
-			if (configurer.Has<ISagaLockProvider>() == false) {
-				configurer.Register<ISagaLockProvider>(res => new SemaphoreSagaLockProvider());
+			if (configurer.Has<IHandlerLockProvider>() == false) {
+				configurer.Register<IHandlerLockProvider>(res => new SemaphoreHandlerLockProvider());
 			}
 			if (configurer.Has<IHandlerLockRetryStrategy>() == false) {
 				configurer.Register<IHandlerLockRetryStrategy>(res => new RandomJitterHandlerLockRetryStrategy(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10)));
@@ -35,7 +35,7 @@ namespace Rebus.SingleAccessSagas {
 					IPipeline pipeline = c.Get<IPipeline>();
 					PipelineStepInjector injector = new PipelineStepInjector(pipeline);
 					ISagaStorage storage = c.Get<ISagaStorage>();
-					ISagaLockProvider lockProvider = c.Get<ISagaLockProvider>();
+					IHandlerLockProvider lockProvider = c.Get<IHandlerLockProvider>();
 					Func<IBus> busFactory = c.Get<IBus>;
 					IHandlerLockRetryStrategy handlerLockRetryStrategy = c.Get<IHandlerLockRetryStrategy>();
 
