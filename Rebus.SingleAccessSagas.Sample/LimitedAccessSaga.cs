@@ -21,7 +21,7 @@ namespace Rebus.SingleAccessSagas.Sample {
 		}
 
 		public ConcurrencyControlInfo GetConcurrencyControlInfoForMessage(PingCommand message) {
-			return new ConcurrencyControlInfo("LimitedAccessHandler", 2);
+			return new ConcurrencyControlInfo("LimitedAccessHandler", 6, 2);
 		}
 
 	}
