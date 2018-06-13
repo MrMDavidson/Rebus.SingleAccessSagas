@@ -25,8 +25,8 @@ namespace Rebus.SingleAccessSagas {
 			if (configurer.Has<ISagaLockProvider>() == false) {
 				configurer.Register<ISagaLockProvider>(res => new SemaphoreSagaLockProvider());
 			}
-			if (configurer.Has<ISagaLockRetryStrategy>() == false) {
-				configurer.Register<ISagaLockRetryStrategy>(res => new RandomJitterSagaLockRetryStrategy(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10)));
+			if (configurer.Has<IHandlerLockRetryStrategy>() == false) {
+				configurer.Register<IHandlerLockRetryStrategy>(res => new RandomJitterHandlerLockRetryStrategy(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10)));
 			}
 
 			configurer.Decorate<IPipeline>(
@@ -37,9 +37,9 @@ namespace Rebus.SingleAccessSagas {
 					ISagaStorage storage = c.Get<ISagaStorage>();
 					ISagaLockProvider lockProvider = c.Get<ISagaLockProvider>();
 					Func<IBus> busFactory = c.Get<IBus>;
-					ISagaLockRetryStrategy sagaLockRetryStrategy = c.Get<ISagaLockRetryStrategy>();
+					IHandlerLockRetryStrategy handlerLockRetryStrategy = c.Get<IHandlerLockRetryStrategy>();
 
-					SingleAccessSagaIncomingStep incomingStep = new SingleAccessSagaIncomingStep(logger.GetLogger<SingleAccessSagaIncomingStep>(), busFactory, lockProvider, storage, sagaLockRetryStrategy);
+					SingleAccessSagaIncomingStep incomingStep = new SingleAccessSagaIncomingStep(logger.GetLogger<SingleAccessSagaIncomingStep>(), busFactory, lockProvider, storage, handlerLockRetryStrategy);
 					injector.OnReceive(incomingStep, PipelineRelativePosition.Before, typeof(LoadSagaDataStep));
 
 					return injector;

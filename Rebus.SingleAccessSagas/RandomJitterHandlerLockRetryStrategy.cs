@@ -3,9 +3,9 @@ using Rebus.Messages;
 
 namespace Rebus.SingleAccessSagas {
 	/// <summary>
-	/// An implementation of <seealso cref="ISagaLockRetryStrategy"/> which uses a a random delay time between a specified maximum and minimum
+	/// An implementation of <seealso cref="IHandlerLockRetryStrategy"/> which uses a a random delay time between a specified maximum and minimum
 	/// </summary>
-	public class RandomJitterSagaLockRetryStrategy : ISagaLockRetryStrategy {
+	public class RandomJitterHandlerLockRetryStrategy : IHandlerLockRetryStrategy {
 		private readonly Random _random;
 		private readonly int _minimumDelayMs;
 		private readonly int _maximumDelayMs;
@@ -15,7 +15,7 @@ namespace Rebus.SingleAccessSagas {
 		/// </summary>
 		/// <param name="minimumDelay">Minimum amount of time to delay a message</param>
 		/// <param name="maximumDelay">Maximum amountof time to delay a message</param>
-		public RandomJitterSagaLockRetryStrategy(TimeSpan minimumDelay, TimeSpan maximumDelay) {
+		public RandomJitterHandlerLockRetryStrategy(TimeSpan minimumDelay, TimeSpan maximumDelay) {
 			_random = new Random();
 
 			if (minimumDelay < TimeSpan.Zero) {

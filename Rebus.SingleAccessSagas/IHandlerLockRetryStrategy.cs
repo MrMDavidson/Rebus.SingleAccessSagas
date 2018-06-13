@@ -5,7 +5,7 @@ namespace Rebus.SingleAccessSagas {
 	/// <summary>
 	/// Responsible for determining the retry interval for messages which have failed to acquire all saga locks
 	/// </summary>
-	public interface ISagaLockRetryStrategy {
+	public interface IHandlerLockRetryStrategy {
 		/// <summary>
 		/// Determine the delay before attempting to retry processing of a message
 		/// </summary>

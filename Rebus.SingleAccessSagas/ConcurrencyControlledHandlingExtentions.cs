@@ -30,9 +30,9 @@ namespace Rebus.SingleAccessSagas {
 				    PipelineStepInjector injector = new PipelineStepInjector(pipeline);
 				    IHandlerLockProvider lockProvider = c.Get<IHandlerLockProvider>();
 				    Func<IBus> busFactory = c.Get<IBus>;
-				    ISagaLockRetryStrategy sagaLockRetryStrategy = c.Get<ISagaLockRetryStrategy>();
+				    IHandlerLockRetryStrategy handlerLockRetryStrategy = c.Get<IHandlerLockRetryStrategy>();
 
-				    ConcurrencyControlledHandlerIncomingStep incomingStep = new ConcurrencyControlledHandlerIncomingStep(busFactory, logger.GetLogger<ConcurrencyControlledHandlerIncomingStep>(), lockProvider, sagaLockRetryStrategy);
+				    ConcurrencyControlledHandlerIncomingStep incomingStep = new ConcurrencyControlledHandlerIncomingStep(busFactory, logger.GetLogger<ConcurrencyControlledHandlerIncomingStep>(), lockProvider, handlerLockRetryStrategy);
 				    injector.OnReceive(incomingStep, PipelineRelativePosition.Before, typeof(LoadSagaDataStep));
 
 				    return injector;

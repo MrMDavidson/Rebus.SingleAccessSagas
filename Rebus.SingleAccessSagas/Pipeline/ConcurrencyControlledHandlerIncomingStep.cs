@@ -32,7 +32,7 @@ Note: this may cause message reordering")]
 		/// <param name="log">Log for writing debug/informational messages</param>
 		/// <param name="handlerLockProvider">Provider for constructing specific locks as required</param>
 		/// <param name="retryStrategy">Strategy for deferring messages when they were not able to acquire their locks</param>
-		public ConcurrencyControlledHandlerIncomingStep(Func<IBus> busFactory, ILog log, IHandlerLockProvider handlerLockProvider, ISagaLockRetryStrategy retryStrategy) : base(busFactory, log, retryStrategy) {
+		public ConcurrencyControlledHandlerIncomingStep(Func<IBus> busFactory, ILog log, IHandlerLockProvider handlerLockProvider, IHandlerLockRetryStrategy retryStrategy) : base(busFactory, log, retryStrategy) {
 			_handlerLockProvider = handlerLockProvider;
 		}
 

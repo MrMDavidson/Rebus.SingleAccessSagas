@@ -33,7 +33,7 @@ Note: this may cause message reordering")]
 		/// <summary>
 		/// Constructs the step
 		/// </summary>
-		public SingleAccessSagaIncomingStep(ILog log, Func<IBus> busFactory, ISagaLockProvider sagaLockProvider, ISagaStorage sagaStorage, ISagaLockRetryStrategy retryStrategy) 
+		public SingleAccessSagaIncomingStep(ILog log, Func<IBus> busFactory, ISagaLockProvider sagaLockProvider, ISagaStorage sagaStorage, IHandlerLockRetryStrategy retryStrategy) 
 			: base(busFactory, log, retryStrategy) {
 			_sagaLockProvider = sagaLockProvider;
 			_sagaStorage = sagaStorage;

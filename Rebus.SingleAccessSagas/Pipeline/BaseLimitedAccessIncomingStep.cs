@@ -19,7 +19,7 @@ namespace Rebus.SingleAccessSagas.Pipeline {
 		protected ILog Log { get; }
 
 		private readonly Lazy<IBus> _bus;
-		private readonly ISagaLockRetryStrategy _retryStrategy;
+		private readonly IHandlerLockRetryStrategy _retryStrategy;
 
 		/// <summary>
 		/// Constructor
@@ -27,7 +27,7 @@ namespace Rebus.SingleAccessSagas.Pipeline {
 		/// <param name="busFactory">A factory that provides a <see cref="IBus"/>. Will not be constructed until a message is processed.</param>
 		/// <param name="log">Logger for the step</param>
 		/// <param name="retryStrategy">Strategy that can determine when to reschedule a message when a message cannot have all of its locks acquired</param>
-		protected BaseLimitedAccessIncomingStep(Func<IBus> busFactory, ILog log, ISagaLockRetryStrategy retryStrategy) {
+		protected BaseLimitedAccessIncomingStep(Func<IBus> busFactory, ILog log, IHandlerLockRetryStrategy retryStrategy) {
 			Log = log;
 			_bus = new Lazy<IBus>(busFactory, true);
 			_retryStrategy = retryStrategy;
