@@ -2,8 +2,22 @@
 
 ## Building Releases
 
+0. Ensure code is pushed to master
+1. Update the Package Info, Assembly Version and File Version as appropriate
+2. Build the code in release
 ```
 dotnet build -c Release
+```
+3. Produce the nuuget package
+```
 dotnet pack -c Release
+```
+4. Verify the contents are correct (Unzip, double check file versions, etc)
+5. Push the package to nuget
+```
 dotnet nuget push \Path\To\Package -s https://nuget.org -k $NugetKey
+```
+6. Create a tag
+```
+git tag -a nuget-{nuget release version} -m "Nuget release {nuget release version}"
 ```
