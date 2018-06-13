@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.0-alpha1 to 0.1.0-alpha2
+
+1. `ConcurrencyControlledHandlingExtentions` is now `ConcurrencyControlledHandlingExtensions`.
+
 ## 0.0.1-alpha6 to 0.1.0-alpha1
 
 1. Introduced `ConcurrencyControlInfo`, This class describes concurrency requirements. `LockIdentifier` is analogous to the `sagaCorrelationId` argument to `ISagaLockProvider::LockFor`. It defines the "scope" of the concurrency requirement and should be treated as an opaque value. `MaxConcurrency` specifies how many concurrent operations for the given `LockIdentifier` are allowed. And `OperationCost` defines the cost of the current operation. If these values are equal (eg. 1 and 1) only a single operation can occur at once. If `MaxConcurrency` is greater than `OperationCost` than multiple operations may occur at once.
