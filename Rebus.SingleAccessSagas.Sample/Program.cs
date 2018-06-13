@@ -37,7 +37,7 @@ namespace Rebus.SingleAccessSagas.Sample {
 					handlerActivator.Register<IHandleMessages<LimitedAccessSaga.StartSagaCommand>>(() => new LimitedAccessSaga(bus));
 					handlerActivator.Register<IHandleMessages<LimitedAccessSaga.IncrementCounterCommand>>(() => new LimitedAccessSaga(bus));
 
-					handlerActivator.Register<IHandleMessages<LimitAccessHandler.PingCommand>>(() => new LimitAccessHandler());
+					handlerActivator.Register<IHandleMessages<LimitedAccessHandler.PingCommand>>(() => new LimitedAccessHandler());
 
 					bus.Advanced.Topics.Subscribe(typeof(NormalSaga.StartSagaCommand).GetSimpleAssemblyQualifiedName());
 					bus.Advanced.Topics.Subscribe(typeof(NormalSaga.IncrementCounterCommand).GetSimpleAssemblyQualifiedName());
@@ -48,7 +48,7 @@ namespace Rebus.SingleAccessSagas.Sample {
 					bus.Advanced.Topics.Subscribe(typeof(LimitedAccessSaga.StartSagaCommand).GetSimpleAssemblyQualifiedName());
 					bus.Advanced.Topics.Subscribe(typeof(LimitedAccessSaga.IncrementCounterCommand).GetSimpleAssemblyQualifiedName());
 
-					bus.Advanced.Topics.Subscribe(typeof(LimitAccessHandler.PingCommand).GetSimpleAssemblyQualifiedName());
+					bus.Advanced.Topics.Subscribe(typeof(LimitedAccessHandler.PingCommand).GetSimpleAssemblyQualifiedName());
 
 
 					void DisplayHelp() {
@@ -118,11 +118,21 @@ namespace Rebus.SingleAccessSagas.Sample {
 							}
 
 							case '8': {
-								Parallel.For(0, 100, (x) => { bus.Send(new LimitAccessHandler.PingCommand()).Wait(); }
+								int batches = 10;
+								int batchSize = 100 / batches;
+
+								Parallel.For(0, batches, (x) => {
+										List<Task> sendTask = new List<Task>();
+										for (int i = 0; i < batchSize; i++) {
+											sendTask.Add(
+												bus.Send(new LimitedAccessHandler.PingCommand() { Number = i + (x * batchSize) })
+											);
+										}
+
+										Task.WaitAll(sendTask.ToArray());
+									}
 								);
 
-								//bus.Send(new LimitedAccessSaga.StartSagaCommand() { Id = Guid.NewGuid(), NumberOfMessages = 100 })
-								//	.Wait();
 								break;
 							}
 						}

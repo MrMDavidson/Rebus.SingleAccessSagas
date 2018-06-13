@@ -5,16 +5,17 @@ using Rebus.Sagas;
 
 namespace Rebus.SingleAccessSagas.Sample {
 
-	public class LimitAccessHandler : IHandleConcurrencyControlledMessages<LimitAccessHandler.PingCommand> {
+	public class LimitedAccessHandler : IHandleConcurrencyControlledMessages<LimitedAccessHandler.PingCommand> {
 		public class PingCommand {
+			public int Number { get; set; }
 		}
 
-		public LimitAccessHandler() {
+		public LimitedAccessHandler() {
 			
 		}
 
 		public Task Handle(PingCommand message) {
-			Console.WriteLine("Pong");
+			Console.WriteLine("Pong {0}", message.Number);
 
 			return Task.CompletedTask;
 		}
