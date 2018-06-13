@@ -22,7 +22,7 @@ namespace Rebus.SingleAccessSagas.Pipeline {
 If they are then locks are acquired for each single access handler the message will encounter. If all locks are not acquired then the message will be deferred for later processing.
 
 Note: this may cause message reordering")]
-	public class SingleAccessSagaIncomingStep : BaseLimitedAccessIncomingStep<ISagaLock> {
+	public class SingleAccessSagaIncomingStep : BaseLimitedAccessIncomingStep<IHandlerLock> {
 		private static readonly Type SingleAccessSagaType = typeof(ISingleAccessSaga);
 		private static readonly Type OpenSagaType = typeof(Saga<>);
 
@@ -49,7 +49,7 @@ Note: this may cause message reordering")]
 		}
 
 		/// <inheritdoc />
-		protected override async Task<bool> TryAcquireLocksForHandler(HandlerInvoker invoker, Message message, IncomingStepContext context, IList<ISagaLock> locks) {
+		protected override async Task<bool> TryAcquireLocksForHandler(HandlerInvoker invoker, Message message, IncomingStepContext context, IList<IHandlerLock> locks) {
 			object body = message.Body;
 			SagaDataCorrelationProperties props = _sagaHelper.GetCorrelationProperties(body, invoker.Saga);
 			IEnumerable<CorrelationProperty> propsForMessage = props.ForMessage(body);
@@ -68,7 +68,7 @@ Note: this may cause message reordering")]
 					continue;
 				}
 
-				ISagaLock slock = await _sagaLockProvider.LockFor(correlationId);
+				IHandlerLock slock = await _sagaLockProvider.LockFor(correlationId);
 				locks.Add(slock);
 				if (await slock.TryAcquire() == true) {
 					continue;

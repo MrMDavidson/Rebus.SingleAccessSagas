@@ -9,9 +9,9 @@ namespace Rebus.SingleAccessSagas {
 		/// <summary>
 		/// Determine the delay before attempting to retry processing of a message
 		/// </summary>
-		/// <param name="failedLock">The last <seealso cref="ISagaLock"/> which could not be acquired. Note: Caller will dispose of the lock</param>
+		/// <param name="failedLock">The last <seealso cref="IHandlerLock"/> which could not be acquired. Note: Caller will dispose of the lock</param>
 		/// <param name="message">Message being processed</param>
 		/// <returns>Delay before retrying processing of the current message</returns>
-		TimeSpan GetMessageRetryInterval(ISagaLock failedLock, Message message);
+		TimeSpan GetMessageRetryInterval(IHandlerLock failedLock, Message message);
 	}
 }

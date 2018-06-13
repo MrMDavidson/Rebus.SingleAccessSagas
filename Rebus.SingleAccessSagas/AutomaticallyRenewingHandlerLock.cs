@@ -5,20 +5,20 @@ using Rebus.Exceptions;
 
 namespace Rebus.SingleAccessSagas {
 	/// <summary>
-	/// Deferring implemtnation of <seealso cref="ISagaLock"/> which will automatically re-acquire the lock periodically. Useful for lease based locks
+	/// Deferring implemtnation of <seealso cref="IHandlerLock"/> which will automatically re-acquire the lock periodically. Useful for lease based locks
 	/// </summary>
-	public class AutomaticallyRenewingSagaLock : ISagaLock {
-		private readonly ISagaLock _actualLock;
+	public class AutomaticallyRenewingHandlerLock : IHandlerLock {
+		private readonly IHandlerLock _actualLock;
 		private readonly TimeSpan _reacquistionInterval;
 		private readonly Timer _lockRenewalTimer;
 		private bool _acquiredLock = false;
 
 		/// <summary>
-		/// Wraps around another instance of a <seealso cref="ISagaLock"/> and automatically renews the lock periodically
+		/// Wraps around another instance of a <seealso cref="IHandlerLock"/> and automatically renews the lock periodically
 		/// </summary>
-		/// <param name="actualLock">An instance of a <seealso cref="ISagaLock"/> which performs the actual lock acquisition</param>
+		/// <param name="actualLock">An instance of a <seealso cref="IHandlerLock"/> which performs the actual lock acquisition</param>
 		/// <param name="reacquistionInterval">Period of time before the lock will be reacquired automatically</param>
-		public AutomaticallyRenewingSagaLock(ISagaLock actualLock, TimeSpan reacquistionInterval) {
+		public AutomaticallyRenewingHandlerLock(IHandlerLock actualLock, TimeSpan reacquistionInterval) {
 			_actualLock = actualLock;
 			_reacquistionInterval = reacquistionInterval;
 

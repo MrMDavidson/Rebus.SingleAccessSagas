@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace Rebus.SingleAccessSagas.Semaphore {
 	/// <summary>
-	/// An implementation of <seealso cref="ISagaLock"/> which uses a machine wide <seealso cref="System.Threading.Semaphore"/> to provide single access saga controls to a single machine. If you have multiple worker machines you will need to use a distributed locking mechanism
+	/// An implementation of <seealso cref="IHandlerLock"/> which uses a machine wide <seealso cref="System.Threading.Semaphore"/> to provide single access saga controls to a single machine. If you have multiple worker machines you will need to use a distributed locking mechanism
 	/// </summary>
-	public class SemaphoreSagaLock : ISagaLock {
+	public class SemaphoreHandlerLock : IHandlerLock {
 		private readonly int _operationCost;
 		private readonly System.Threading.Semaphore _semaphore;
 		private int _acquired = 0;
@@ -14,7 +14,7 @@ namespace Rebus.SingleAccessSagas.Semaphore {
 		/// <summary>
 		/// Constructs a new instance of the lock and creates a system wide semaphore named <paramref name="semaphoreName"/>
 		/// </summary>
-		public SemaphoreSagaLock(string semaphoreName, int maxConcurrency = 1, int operationCost = 1) {
+		public SemaphoreHandlerLock(string semaphoreName, int maxConcurrency = 1, int operationCost = 1) {
 			_operationCost = operationCost;
 			_semaphore = new System.Threading.Semaphore(maxConcurrency, maxConcurrency, semaphoreName);
 		}

@@ -18,7 +18,7 @@ namespace Rebus.SingleAccessSagas.Pipeline {
 	[StepDocumentation(@"Checks to see if a message requires concurrency controls. If they are then locks are acquired for each handler the message will encounter. If all locks are not acquired then the message will be deferred for later processing.
 
 Note: this may cause message reordering")]
-	public class ConcurrencyControlledHandlerIncomingStep : BaseLimitedAccessIncomingStep<ISagaLock> {
+	public class ConcurrencyControlledHandlerIncomingStep : BaseLimitedAccessIncomingStep<IHandlerLock> {
 		private static readonly Type HandleConcurrencyControlledMessagesType = typeof(IHandleConcurrencyControlledMessages);
 		private static readonly Type OpenHandleConcurrencyControlledMessagesType = typeof(IHandleConcurrencyControlledMessages<>);
 		private static readonly ConcurrentDictionary<Type, Func<IHandleConcurrencyControlledMessages, object, ConcurrencyControlInfo>> GetGetConcurrencyControlInfoForMessageCache = new ConcurrentDictionary<Type, Func<IHandleConcurrencyControlledMessages, object, ConcurrencyControlInfo>>();
@@ -37,7 +37,7 @@ Note: this may cause message reordering")]
 		}
 
 		/// <inheritdoc />
-		protected override async Task<bool> TryAcquireLocksForHandler(HandlerInvoker invoker, Message message, IncomingStepContext context, IList<ISagaLock> locks) {
+		protected override async Task<bool> TryAcquireLocksForHandler(HandlerInvoker invoker, Message message, IncomingStepContext context, IList<IHandlerLock> locks) {
 			Type messageBodyType = message.Body.GetType();
 			//Type invokerType = GetHandlerType(invoker.Handler.GetType(), messageBodyType);
 			Func<IHandleConcurrencyControlledMessages, object, ConcurrencyControlInfo> getConcurrencyControlInfoForMessage = GetGetConcurrencyControlInfoForMessageCache.GetOrAdd(messageBodyType, BuildExpression);
@@ -50,7 +50,7 @@ Note: this may cause message reordering")]
 			}
 
 			// Create the lock of the concurrency requirement
-			ISagaLock handlerLock = await _handlerLockProvider.LockFor(accessInfo);
+			IHandlerLock handlerLock = await _handlerLockProvider.LockFor(accessInfo);
 			locks.Add(handlerLock);
 
 			// Attempt to acquire the lock

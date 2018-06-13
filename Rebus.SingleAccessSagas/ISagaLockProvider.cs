@@ -6,10 +6,10 @@ namespace Rebus.SingleAccessSagas {
 	/// </summary>
 	public interface ISagaLockProvider {
 		/// <summary>
-		/// Acquire a <seealso cref="ISagaLock"/> that can provide mutual exclusion semantics to a given saga
+		/// Acquire a <seealso cref="IHandlerLock"/> that can provide mutual exclusion semantics to a given saga
 		/// </summary>
 		/// <param name="sagaCorrelationId">The correlation identifier of the saga the lock is requested for. Implementors would usually use this to key a lock specific to this saga</param>
-		/// <returns>A <seealso cref="ISagaLock"/> that can be acquired for this saga</returns>
-		Task<ISagaLock> LockFor(object sagaCorrelationId);
+		/// <returns>A <seealso cref="IHandlerLock"/> that can be acquired for this saga</returns>
+		Task<IHandlerLock> LockFor(object sagaCorrelationId);
 	}
 }

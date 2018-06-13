@@ -6,10 +6,10 @@ namespace Rebus.SingleAccessSagas.Semaphore {
 	/// </summary>
 	public class SemaphoreHandlerLockProvider : IHandlerLockProvider {
 		/// <summary>
-		/// Provide a <seealso cref="SemaphoreSagaLock"/> for <paramref name="lockInfo"/>
+		/// Provide a <seealso cref="SemaphoreHandlerLock"/> for <paramref name="lockInfo"/>
 		/// </summary>
-		public Task<ISagaLock> LockFor(ConcurrencyControlInfo lockInfo) {
-			return Task.FromResult<ISagaLock>(new SemaphoreSagaLock($"rbs2-limited-access-handler-lock-{lockInfo.LockIdentifier}", lockInfo.MaxConcurrency, lockInfo.OperationCost));
+		public Task<IHandlerLock> LockFor(ConcurrencyControlInfo lockInfo) {
+			return Task.FromResult<IHandlerLock>(new SemaphoreHandlerLock($"rbs2-limited-access-handler-lock-{lockInfo.LockIdentifier}", lockInfo.MaxConcurrency, lockInfo.OperationCost));
 		}
 	}
 }

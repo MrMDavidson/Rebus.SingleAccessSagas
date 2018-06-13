@@ -7,12 +7,12 @@ namespace Rebus.SingleAccessSagas.Semaphore {
 	/// </summary>
 	public class SemaphoreSagaLockProvider : ISagaLockProvider {
 		/// <summary>
-		/// Acquire a <seealso cref="ISagaLock"/> that can provide mutual exclusion semantics to a given saga
+		/// Acquire a <seealso cref="IHandlerLock"/> that can provide mutual exclusion semantics to a given saga
 		/// </summary>
 		/// <param name="sagaCorrelationId">The correlation identifier of the saga the lock is requested for. Implementors would usually use this to key a lock specific to this saga</param>
-		/// <returns>A <seealso cref="ISagaLock"/> that can be acquired for this saga</returns>
-		public Task<ISagaLock> LockFor(object sagaCorrelationId) {
-			return Task.FromResult<ISagaLock>(new SemaphoreSagaLock($"rbs2-single-access-sagas-lock-{sagaCorrelationId}"));
+		/// <returns>A <seealso cref="IHandlerLock"/> that can be acquired for this saga</returns>
+		public Task<IHandlerLock> LockFor(object sagaCorrelationId) {
+			return Task.FromResult<IHandlerLock>(new SemaphoreHandlerLock($"rbs2-single-access-sagas-lock-{sagaCorrelationId}"));
 		}
 	}
 }
