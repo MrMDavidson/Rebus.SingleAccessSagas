@@ -15,16 +15,25 @@
 		/// The maximum number of messages, for <seealso cref="LockIdentifier"/>, that can be processed at once.
 		/// </summary>
 		/// <remarks>Ensure that for a given <seealso cref="LockIdentifier"/> you always set the same <see cref="MaxConcurrency"/>. Results will be unpredictable otherwise.</remarks>
-		public int MaxConcurrency {get; }
+		public int MaxConcurrency { get; }
+
+		/// <summary>
+		/// The cost of the operation. You might have a scenario where several operations use the same lock identifier but are more intensive.
+		///  </summary>
+		/// <example>An operation that does tensor flow analysis might have a cost of 3. Whilst an operation that performs a CRUD DB operation might have a cost of 1</example>
+		/// <remarks>If <seealso cref="MaxConcurrency"/> is equal to <seealso cref="OperationCost"/> only one operation will happen at once. If <seealso cref="MaxConcurrency"/> is greater than multiple operations can occur at once. If <seealso cref="OperationCost"/> is greater than no operations will ever be perfomed</remarks>
+		public int OperationCost { get; }
 
 		/// <summary>
 		/// Constructs a new <see cref="ConcurrencyControlInfo"/>
 		/// </summary>
 		/// <param name="identifier">Identifier of the lock</param>
 		/// <param name="maxConcurrency">Maximum number of concurrent handlers</param>
-		public ConcurrencyControlInfo(object identifier, int maxConcurrency = 1) {
+		/// <param name="operationCost">Cost of performing this operation.</param>
+		public ConcurrencyControlInfo(object identifier, int maxConcurrency = 1, int operationCost = 1) {
 			LockIdentifier = identifier;
 			MaxConcurrency = maxConcurrency;
+			OperationCost = operationCost;
 		}
 	}
 }
