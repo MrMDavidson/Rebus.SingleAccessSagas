@@ -21,3 +21,12 @@ dotnet nuget push \Path\To\Package -s https://nuget.org -k $NugetKey
 ```
 git tag -a nuget-{nuget release version} -m "Nuget release {nuget release version}"
 ```
+7. Push tags
+```
+git push --tags
+```
+
+or to only push the tag just created;
+```
+git push origin nuget-{nuget releaseversion}
+```
