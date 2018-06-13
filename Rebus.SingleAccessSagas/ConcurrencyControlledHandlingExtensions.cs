@@ -13,7 +13,7 @@ namespace Rebus.SingleAccessSagas {
 	///
 	/// This can be useful to provide infrastructure level throttling. For example; you might limit the number of concurrent operations a customre can perform. Or you might have an external API that you want to ensure you do not flood
 	/// </summary>
-    public static class ConcurrencyControlledHandlingExtentions {
+    public static class ConcurrencyControlledHandlingExtensions {
 		/// <summary>
 		/// Enables concurrency controlled handlers. When enabled handlers deriving from <seealso cref="IHandleConcurrencyControlledMessages{TMessageType}"/> will have their lock requirements interrogated (via <seealso cref="IHandleConcurrencyControlledMessages{TMessageType}.GetConcurrencyControlInfoForMessage"/> and appropriate locks will be acquired via the registered <seealso cref="IHandlerLockProvider"/>. If all locks cannot be acquired the message will be deferred.
 		/// </summary>
