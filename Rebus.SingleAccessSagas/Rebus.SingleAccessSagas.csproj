@@ -20,8 +20,12 @@
     <FileVersion>0.0.1.5</FileVersion>
     <AssemblyVersion>0.0.1.0</AssemblyVersion>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Rebus.SingleAccessSagas.xml</DocumentationFile>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <TreatSpecificWarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.3|AnyCPU'">
+    <WarningsAsErrors />
   </PropertyGroup>
 
   <ItemGroup>
