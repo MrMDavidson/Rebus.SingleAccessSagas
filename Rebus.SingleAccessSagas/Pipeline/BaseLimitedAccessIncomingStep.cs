@@ -55,8 +55,7 @@ namespace Rebus.SingleAccessSagas.Pipeline {
 					if (await TryAcquireLocksForHandler(handler, message, context, locks) == false) {
 						acquiredAllLocks = false;
 
-						// TODO: MD: Convert to passing in the Handler that failed
-						retryInterval = _retryStrategy.GetMessageRetryInterval(null, message);
+						retryInterval = _retryStrategy.GetMessageRetryInterval(handler, message, context);
 
 						break;
 					}

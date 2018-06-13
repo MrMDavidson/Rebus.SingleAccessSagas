@@ -1,5 +1,7 @@
 ﻿using System;
 using Rebus.Messages;
+using Rebus.Pipeline;
+using Rebus.Pipeline.Receive;
 
 namespace Rebus.SingleAccessSagas {
 	/// <summary>
@@ -9,9 +11,10 @@ namespace Rebus.SingleAccessSagas {
 		/// <summary>
 		/// Determine the delay before attempting to retry processing of a message
 		/// </summary>
-		/// <param name="failedLock">The last <seealso cref="IHandlerLock"/> which could not be acquired. Note: Caller will dispose of the lock</param>
+		/// <param name="unlockedHandler">The <seealso cref="HandlerInvoker"/> for which the a lock could not be acquired.</param>
 		/// <param name="message">Message being processed</param>
+		/// <param name="context">Context for message processing</param>
 		/// <returns>Delay before retrying processing of the current message</returns>
-		TimeSpan GetMessageRetryInterval(IHandlerLock failedLock, Message message);
+		TimeSpan GetMessageRetryInterval(HandlerInvoker unlockedHandler, Message message, IncomingStepContext context);
 	}
 }
