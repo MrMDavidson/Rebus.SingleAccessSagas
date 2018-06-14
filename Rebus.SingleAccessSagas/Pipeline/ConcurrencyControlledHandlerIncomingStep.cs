@@ -56,7 +56,7 @@ Note: this may cause message reordering")]
 			// Attempt to acquire the lock
 			if (await handlerLock.TryAcquire() == false) {
 				// Fail if it cannot be acquired
-				Log.Debug($"{message.GetMessageLabel()} could not acquire a lock for {invoker.Handler.GetType().FullName}.");
+				Log.Debug($"{message.GetMessageLabel()} could not acquire a lock for {invoker.Handler.GetType().FullName} (LockId: {accessInfo.LockIdentifier}).");
 				return false;
 			}
 
