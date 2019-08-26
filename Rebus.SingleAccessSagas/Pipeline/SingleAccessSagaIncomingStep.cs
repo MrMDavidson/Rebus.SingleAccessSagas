@@ -69,13 +69,14 @@ Note: this may cause message reordering")]
 					continue;
 				}
 
-				IHandlerLock slock = await _lockProvider.LockFor(new ConcurrencyControlInfo(correlationId, maxConcurrency: 1, operationCost: 1));
+				object lockIdentifier = $"{sagaDataType.GetSimpleAssemblyQualifiedName()}_{correlationId}";
+				IHandlerLock slock = await _lockProvider.LockFor(new ConcurrencyControlInfo(lockIdentifier, maxConcurrency: 1, operationCost: 1));
 				locks.Add(slock);
 				if (await slock.TryAcquire() == true) {
 					continue;
 				}
 
-				Log.Debug($"{message.GetMessageLabel()} could not acquire a saga lock for {correlationId} to process {invoker.Handler.GetType().FullName}");
+				Log.Debug($"{message.GetMessageLabel()} could not acquire a saga lock ({lockIdentifier}) for correlation id ({correlationId}) to process {invoker.Handler.GetType().FullName}");
 				allLocksAcquired = false;
 				break;
 			}
