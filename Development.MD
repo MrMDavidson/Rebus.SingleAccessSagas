@@ -8,7 +8,7 @@
 ```
 dotnet build -c Release
 ```
-3. Produce the nuuget package
+3. Produce the nuget package
 ```
 dotnet pack -c Release
 ```
