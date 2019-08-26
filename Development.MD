@@ -10,12 +10,12 @@ dotnet build -c Release
 ```
 3. Produce the nuget package
 ```
-dotnet pack -c Release
+dotnet pack Rebus.SingleAccessSagas\Rebus.SingleAccessSagas.csproj -c Release --output ..\nupkgs
 ```
 4. Verify the contents are correct (Unzip, double check file versions, etc)
 5. Push the package to nuget
 ```
-dotnet nuget push \Path\To\Package -s https://nuget.org -k $NugetKey
+dotnet nuget push nupkgs\Path\To\Package -s https://nuget.org -k $NugetKey
 ```
 6. Create a tag
 ```
